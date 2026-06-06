@@ -1,0 +1,50 @@
+{% extends "control/base_control.jinja" %}
+{% block title %}Users{% endblock %}
+{% block page_title %}Users{% endblock %}
+
+{% block content %}
+<div class="space-y-4">
+  <div class="flex items-center gap-4">
+    <input type="search" placeholder="Search by email or name..."
+           hx-get="{{ url('control:users') }}"
+           hx-trigger="keyup changed delay:300ms"
+           hx-target="#user-table"
+           hx-swap="innerHTML"
+           name="q"
+           class="bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-sm text-gray-300 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-rose-500 w-72">
+  </div>
+
+  <div class="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <table class="w-full text-sm" id="user-table">
+      <thead>
+        <tr class="text-xs text-gray-500 uppercase tracking-wider border-b border-gray-800">
+          <th class="text-left px-5 py-3">Email</th>
+          <th class="text-left px-5 py-3">Name</th>
+          <th class="text-left px-5 py-3">Staff</th>
+          <th class="text-left px-5 py-3">Active</th>
+          <th class="text-left px-5 py-3">Joined</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-800">
+        {% for user in users %}
+        <tr class="hover:bg-gray-800/50 transition-colors">
+          <td class="px-5 py-3 text-gray-300 font-medium">{{ user.email }}</td>
+          <td class="px-5 py-3 text-gray-400">{{ user.get_full_name() }}</td>
+          <td class="px-5 py-3">
+            {% if user.is_staff %}
+              <span class="text-xs bg-rose-900 text-rose-300 px-2 py-0.5 rounded">Staff</span>
+            {% endif %}
+          </td>
+          <td class="px-5 py-3">
+            <span class="text-xs {{ 'text-green-400' if user.is_active else 'text-red-400' }}">
+              {{ 'Active' if user.is_active else 'Inactive' }}
+            </span>
+          </td>
+          <td class="px-5 py-3 text-gray-500">{{ user.date_joined.strftime('%b %d, %Y') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

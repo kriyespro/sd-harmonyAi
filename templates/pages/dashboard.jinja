@@ -1,0 +1,87 @@
+{% extends "layouts/app.jinja" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+  {# Welcome banner #}
+  <div class="bg-gradient-to-r from-rose-500 to-pink-500 rounded-2xl p-6 text-white">
+    <h2 class="text-xl font-bold mb-1">Good to see you, {{ request.user.first_name }}!</h2>
+    <p class="text-rose-100 text-sm">Track your relationship health daily — small habits prevent big conflicts.</p>
+  </div>
+
+  {# Pending invites #}
+  {% if pending_invites %}
+  <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+    <p class="font-semibold text-amber-800 text-sm mb-2">Pending Invites</p>
+    {% for invite in pending_invites %}
+    <div class="flex items-center justify-between py-2">
+      <span class="text-sm text-gray-700">{{ invite.creator.get_full_name() }} invited you to a {{ invite.get_relationship_type_display() }} relationship</span>
+      <div class="flex gap-2">
+        <button class="text-xs bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600">Accept</button>
+        <button class="text-xs bg-gray-200 text-gray-600 px-3 py-1 rounded-lg hover:bg-gray-300">Decline</button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {# Relationships grid #}
+  {% if relationships %}
+  <div>
+    <h3 class="font-semibold text-gray-900 mb-3">Your Relationships</h3>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {% for rel in relationships %}
+      {% set other = rel.get_other_user(request.user) %}
+      <div class="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-shadow">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 bg-rose-100 rounded-full flex items-center justify-center">
+            <span class="text-rose-600 font-semibold">{{ other.first_name[0] | upper }}</span>
+          </div>
+          <div>
+            <p class="font-medium text-gray-900 text-sm">{{ other.get_full_name() }}</p>
+            <p class="text-xs text-gray-500">{{ rel.get_relationship_type_display() }}</p>
+          </div>
+        </div>
+        <a href="{{ url('relationships:detail', pk=rel.pk) }}" class="block text-center text-xs bg-rose-50 text-rose-600 py-2 rounded-lg hover:bg-rose-100 transition-colors font-medium">
+          View Health Score →
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% else %}
+  {# Empty state #}
+  <div class="bg-white rounded-2xl border border-dashed border-gray-300 p-12 text-center">
+    <div class="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+      <span class="text-3xl">💞</span>
+    </div>
+    <h3 class="font-semibold text-gray-900 mb-2">No relationships yet</h3>
+    <p class="text-gray-500 text-sm mb-6">Add your first relationship to start tracking connection health.</p>
+    <a href="{{ url('relationships:create') }}" class="inline-block bg-rose-500 text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-rose-600 transition-colors">
+      Add Relationship
+    </a>
+  </div>
+  {% endif %}
+
+  {# Recent mood entries #}
+  {% if mood_today %}
+  <div>
+    <h3 class="font-semibold text-gray-900 mb-3">Recent Check-ins</h3>
+    <div class="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+      {% for mood in mood_today %}
+      <div class="flex items-center justify-between px-5 py-3">
+        <div>
+          <p class="text-sm font-medium text-gray-900">{{ mood.relationship }}</p>
+          <p class="text-xs text-gray-500">{{ mood.date }}</p>
+        </div>
+        <span class="text-lg">{{ mood.get_mood_display().split(' ')[0] }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

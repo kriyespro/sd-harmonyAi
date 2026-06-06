@@ -1,0 +1,282 @@
+{% extends "layouts/app.jinja" %}
+{% block title %}{{ other_user.get_full_name() }}{% endblock %}
+{% block page_title %}{{ other_user.get_full_name() }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+  {# Health Score Card #}
+  <div class="bg-white rounded-2xl border border-gray-200 p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-semibold text-gray-900">Relationship Health</h2>
+      <span class="text-xs text-gray-400">Last 30 days</span>
+    </div>
+    <div class="flex items-center gap-6">
+      <div class="relative w-24 h-24 flex-shrink-0">
+        <svg class="w-24 h-24 -rotate-90" viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="16" fill="none" stroke="#f3f4f6" stroke-width="3"/>
+          <circle cx="18" cy="18" r="16" fill="none"
+                  stroke="{{ '#22c55e' if health.color == 'green' else '#3b82f6' if health.color == 'blue' else '#eab308' if health.color == 'yellow' else '#ef4444' }}"
+                  stroke-width="3"
+                  stroke-dasharray="{{ health.overall }}, 100"
+                  stroke-linecap="round"/>
+        </svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center">
+          <span class="font-bold text-xl text-gray-900">{{ health.overall }}</span>
+          <span class="text-xs text-gray-400">/ 100</span>
+        </div>
+      </div>
+      <div class="flex-1 grid grid-cols-3 gap-4">
+        <div class="text-center">
+          <p class="text-2xl font-bold text-gray-900">{{ health.mood_score }}</p>
+          <p class="text-xs text-gray-500">Mood</p>
+        </div>
+        <div class="text-center">
+          <p class="text-2xl font-bold text-gray-900">{{ health.connection_score }}</p>
+          <p class="text-xs text-gray-500">Connection</p>
+        </div>
+        <div class="text-center">
+          <p class="text-2xl font-bold text-gray-900">{{ health.conflict_score }}</p>
+          <p class="text-xs text-gray-500">Conflict</p>
+        </div>
+      </div>
+    </div>
+    {% if patterns %}
+    <div class="mt-4 pt-4 border-t border-gray-100">
+      <p class="text-xs text-gray-500 mb-2">Recurring conflict topics:</p>
+      <div class="flex flex-wrap gap-2">
+        {% for p in patterns %}
+        <span class="text-xs bg-red-50 text-red-600 px-2 py-1 rounded-full">{{ p.category }} ({{ p.count }}×)</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="grid lg:grid-cols-2 gap-6">
+
+    {# Daily Check-in #}
+    <div class="bg-white rounded-2xl border border-gray-200 p-5">
+      <h3 class="font-semibold text-gray-900 mb-4">Today's Check-in</h3>
+      <form hx-post="{{ url('moods:checkin', rel_pk=relationship.pk) }}"
+            hx-target="#mood-result"
+            hx-swap="innerHTML">
+        {{ csrf_input }}
+        <p class="text-sm text-gray-600 mb-3">How do you feel today?</p>
+        <div class="flex gap-2 mb-3">
+          {% for value, emoji_label in [('happy','😊'),('neutral','😐'),('sad','😔'),('angry','😡'),('stressed','😰')] %}
+          <label class="flex-1 cursor-pointer" x-data>
+            <input type="radio" name="mood" value="{{ value }}" class="sr-only" required>
+            <div class="text-center py-2 border-2 border-gray-200 rounded-xl hover:border-rose-300 transition-colors text-lg"
+                 x-bind:class="''" onclick="this.closest('label').querySelector('input').checked=true; document.querySelectorAll('.mood-btn').forEach(e=>e.classList.remove('border-rose-500','bg-rose-50')); this.classList.add('border-rose-500','bg-rose-50')"
+                 class="mood-btn">
+              {{ emoji_label }}
+            </div>
+          </label>
+          {% endfor %}
+        </div>
+        <input type="text" name="note" placeholder="Add a note (optional)..."
+               class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-rose-400">
+        <button type="submit" class="w-full bg-rose-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-rose-600 transition-colors">
+          Log Mood
+        </button>
+      </form>
+      <div id="mood-result" class="mt-2"></div>
+
+      <div class="border-t border-gray-100 mt-4 pt-4">
+        <p class="text-sm text-gray-600 mb-2">Connection today (1–10)?</p>
+        <form hx-post="{{ url('moods:connection', rel_pk=relationship.pk) }}"
+              hx-target="#conn-result"
+              hx-swap="innerHTML"
+              class="flex items-center gap-2">
+          {{ csrf_input }}
+          <input type="range" name="score" min="1" max="10" value="7" class="flex-1 accent-rose-500">
+          <button type="submit" class="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">Save</button>
+        </form>
+        <div id="conn-result" class="mt-1"></div>
+      </div>
+    </div>
+
+    {# Upcoming Events #}
+    <div class="bg-white rounded-2xl border border-gray-200 p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-semibold text-gray-900">Upcoming Events</h3>
+        <button onclick="document.getElementById('add-event-modal').classList.remove('hidden')"
+                class="text-xs text-rose-500 hover:text-rose-700 font-medium">+ Add</button>
+      </div>
+      {% if upcoming_events %}
+      <div class="space-y-2">
+        {% for event in upcoming_events %}
+        <div class="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">
+          <div class="w-8 h-8 bg-rose-50 rounded-lg flex items-center justify-center text-sm">
+            {{ {'birthday':'🎂','anniversary':'💍','promise':'🤝','vacation':'✈️','family':'👨‍👩‍👧','other':'📅'}[event.event_type] }}
+          </div>
+          <div class="flex-1">
+            <p class="text-sm font-medium text-gray-900">{{ event.title }}</p>
+            <p class="text-xs text-gray-500">{{ event.date.strftime('%b %d, %Y') }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-sm text-gray-400 text-center py-4">No upcoming events</p>
+      {% endif %}
+    </div>
+  </div>
+
+  {# AI Engine Cards #}
+  <div class="grid lg:grid-cols-3 gap-4">
+
+    {# AI Conflict Analyzer #}
+    <a href="{{ url('ai_engine:analyze', rel_pk=relationship.pk) }}"
+       class="group bg-gradient-to-br from-rose-50 to-pink-50 border border-rose-200 rounded-2xl p-5 hover:border-rose-400 transition-colors">
+      <div class="w-10 h-10 bg-rose-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-rose-200 transition-colors">
+        <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.347.347a3.78 3.78 0 01-.57.37l-.008.004A3.714 3.714 0 0112 17m0 0V9"/>
+        </svg>
+      </div>
+      <h4 class="font-semibold text-gray-900 text-sm mb-1">Conflict Analyzer</h4>
+      <p class="text-xs text-gray-500">AI finds root causes + action steps</p>
+    </a>
+
+    {# Weekly Report #}
+    <a href="{{ url('ai_engine:report', rel_pk=relationship.pk) }}"
+       class="group bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-200 rounded-2xl p-5 hover:border-indigo-400 transition-colors">
+      <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-indigo-200 transition-colors">
+        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+        </svg>
+      </div>
+      <h4 class="font-semibold text-gray-900 text-sm mb-1">Weekly Report</h4>
+      <p class="text-xs text-gray-500">AI health summary + trend analysis</p>
+    </a>
+
+    {# AI Coach #}
+    <a href="{{ url('ai_engine:coach', rel_pk=relationship.pk) }}"
+       class="group bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-5 hover:border-emerald-400 transition-colors">
+      <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-emerald-200 transition-colors">
+        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+        </svg>
+      </div>
+      <h4 class="font-semibold text-gray-900 text-sm mb-1">AI Coach</h4>
+      <p class="text-xs text-gray-500">Chat with your relationship coach</p>
+    </a>
+
+  </div>
+
+  {# Pattern Detection #}
+  <div class="bg-white rounded-2xl border border-gray-200 p-5">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="font-semibold text-gray-900">Pattern Detection</h3>
+      <button
+        hx-post="{{ url('ai_engine:patterns', rel_pk=relationship.pk) }}"
+        hx-target="#pattern-result"
+        hx-swap="innerHTML"
+        hx-indicator="#pattern-spinner"
+        class="flex items-center gap-1.5 text-xs font-medium text-indigo-600 hover:text-indigo-800 transition-colors">
+        <span>Analyze 30 days</span>
+        <span id="pattern-spinner" class="htmx-indicator">
+          <svg class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+        </span>
+      </button>
+      {{ csrf_input }}
+    </div>
+    <div id="pattern-result">
+      <p class="text-sm text-gray-400 text-center py-3">Click "Analyze 30 days" to detect behavioral patterns.</p>
+    </div>
+  </div>
+
+  {# Conflict Log #}
+  <div class="bg-white rounded-2xl border border-gray-200 p-5">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-semibold text-gray-900">Conflict Journal</h3>
+      <button onclick="document.getElementById('add-conflict-modal').classList.remove('hidden')"
+              class="text-xs text-rose-500 hover:text-rose-700 font-medium">+ Log Conflict</button>
+    </div>
+    {% if conflicts %}
+    <div class="space-y-3">
+      {% for c in conflicts %}
+      <div class="flex items-start gap-3 p-3 rounded-xl {{ 'bg-gray-50' if c.resolved else 'bg-red-50' }}">
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-xs font-semibold uppercase tracking-wide {{ 'text-gray-500' if c.resolved else 'text-red-600' }}">{{ c.category }}</span>
+            <span class="text-xs text-gray-400">Severity {{ c.severity }}/5</span>
+            {% if c.resolved %}<span class="text-xs text-green-600 bg-green-100 px-2 py-0.5 rounded-full">Resolved</span>{% endif %}
+          </div>
+          <p class="text-sm text-gray-700">{{ c.description }}</p>
+        </div>
+        {% if not c.resolved %}
+        <form method="post" action="{{ url('relationships:resolve_conflict', pk=c.pk) }}">
+          {{ csrf_input }}
+          <button type="submit" class="text-xs text-green-600 hover:text-green-800 font-medium flex-shrink-0">Resolve</button>
+        </form>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-sm text-gray-400 text-center py-4">No conflicts logged — that's a great sign!</p>
+    {% endif %}
+  </div>
+
+</div>
+
+{# Add Event Modal #}
+<div id="add-event-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+  <div class="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-semibold text-gray-900">Add Event</h3>
+      <button onclick="document.getElementById('add-event-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">✕</button>
+    </div>
+    <form method="post" action="{{ url('relationships:add_event', pk=relationship.pk) }}">
+      {{ csrf_input }}
+      <div class="space-y-3">
+        <select name="event_type" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400">
+          {% for val, label in event_form.fields.event_type.choices %}
+          <option value="{{ val }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+        <input type="text" name="title" placeholder="Title" required
+               class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400">
+        <input type="date" name="date" required
+               class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400">
+        <label class="flex items-center gap-2 text-sm text-gray-600">
+          <input type="checkbox" name="is_recurring" class="rounded"> Repeats yearly
+        </label>
+      </div>
+      <button type="submit" class="w-full mt-4 bg-rose-500 text-white py-2.5 rounded-xl font-semibold hover:bg-rose-600 transition-colors">Add Event</button>
+    </form>
+  </div>
+</div>
+
+{# Add Conflict Modal #}
+<div id="add-conflict-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+  <div class="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-semibold text-gray-900">Log Conflict</h3>
+      <button onclick="document.getElementById('add-conflict-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">✕</button>
+    </div>
+    <form method="post" action="{{ url('relationships:add_conflict', pk=relationship.pk) }}">
+      {{ csrf_input }}
+      <div class="space-y-3">
+        <select name="category" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400">
+          {% for val, label in conflict_form.fields.category.choices %}
+          <option value="{{ val }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+        <textarea name="description" placeholder="What happened?" rows="3" required
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400"></textarea>
+        <div>
+          <label class="text-sm text-gray-600 block mb-1">Severity (1 = minor, 5 = major)</label>
+          <input type="range" name="severity" min="1" max="5" value="2" class="w-full accent-rose-500">
+        </div>
+      </div>
+      <button type="submit" class="w-full mt-4 bg-rose-500 text-white py-2.5 rounded-xl font-semibold hover:bg-rose-600 transition-colors">Log Conflict</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

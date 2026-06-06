@@ -1,0 +1,38 @@
+{% extends "control/base_control.jinja" %}
+{% block title %}Overview{% endblock %}
+{% block page_title %}Overview{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="bg-gray-900 rounded-xl border border-gray-800 p-5">
+      <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Total Users</p>
+      <p class="text-3xl font-bold text-white">{{ total_users }}</p>
+    </div>
+  </div>
+
+  <div class="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div class="px-5 py-4 border-b border-gray-800">
+      <h3 class="font-semibold text-sm text-gray-300">Recent Signups</h3>
+    </div>
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-xs text-gray-500 uppercase tracking-wider border-b border-gray-800">
+          <th class="text-left px-5 py-3">Email</th>
+          <th class="text-left px-5 py-3">Name</th>
+          <th class="text-left px-5 py-3">Joined</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-800">
+        {% for user in recent_users %}
+        <tr class="hover:bg-gray-800/50 transition-colors">
+          <td class="px-5 py-3 text-gray-300">{{ user.email }}</td>
+          <td class="px-5 py-3 text-gray-400">{{ user.get_full_name() }}</td>
+          <td class="px-5 py-3 text-gray-500">{{ user.date_joined.strftime('%b %d, %Y') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

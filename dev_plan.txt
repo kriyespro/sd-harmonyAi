@@ -1,0 +1,45 @@
+HarmonyAI — Development Plan
+==============================
+
+PHASE 1: Foundation + Auth + Relationships (MVP)
+-------------------------------------------------
+[x] Django project setup (harmonyai)
+[x] Custom User model (email-based auth)
+[x] Profile model
+[x] Register / Login / Logout views
+[x] Landing page
+[x] Dashboard home
+[x] Mission Control (/admin/)
+[x] Relationship model (couple, parent_child, friends, business)
+[x] Event model
+[x] ConflictEntry model
+[x] MoodEntry model
+[x] ConnectionScore model
+[x] Relationship create view + invite flow
+[x] Accept/decline invite
+[x] Daily mood check-in form (HTMX)
+[x] Daily connection score form (HTMX)
+[x] Event tracker CRUD
+[x] Conflict journal CRUD
+[x] Relationship health score calculation (service)
+[x] Health score display widget (circular gauge + scores)
+[x] Superuser / test data
+[x] REST API (DRF + JWT) — /api/v1/
+[x] Flutter mobile app — flutter_app/
+
+PHASE 2: AI Engine
+------------------
+[x] Claude API integration (ai_engine/services.py, claude-opus-4-8)
+[x] Conflict analyzer endpoint (web HTMX + REST API)
+[x] Pattern detection (last 30 days, web HTMX + REST API)
+[x] Weekly AI report generation (web HTMX + REST API)
+[x] AI relationship coach chat interface (web + Flutter)
+
+PHASE 3: Premium + Revenue
+---------------------------
+[x] Freemium gate (is_premium on Profile — check_ai_limit in billing/services.py)
+[x] Premium subscription ₹199/month (Subscription model, billing app)
+[x] Razorpay integration (create order, verify payment, test mode)
+[x] Couples counseling referral links (in premium_screen.dart + weekly_report_screen.dart)
+[x] Flutter: premium_screen.dart, paywall gates on AI features, usage badges
+[x] Flow fixes: serializer read_only fields, token refresh, LoginView, isPremium in User model

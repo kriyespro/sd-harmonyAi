@@ -1,0 +1,90 @@
+{% extends "base.jinja" %}
+{% block title %}HarmonyAI — Prevent Relationship Problems Before They Become Crises{% endblock %}
+
+{% block body %}
+<div class="min-h-full">
+  {# Nav #}
+  <nav class="bg-white border-b border-gray-100">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-rose-500 rounded-lg flex items-center justify-center">
+          <span class="text-white font-bold text-sm">H</span>
+        </div>
+        <span class="font-semibold text-gray-900 text-lg">HarmonyAI</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="{{ url('users:login') }}" class="text-sm text-gray-600 hover:text-gray-900">Login</a>
+        <a href="{{ url('users:register') }}" class="text-sm bg-rose-500 text-white px-4 py-2 rounded-lg hover:bg-rose-600 transition-colors">Get Started Free</a>
+      </div>
+    </div>
+  </nav>
+
+  {# Hero #}
+  <section class="bg-gradient-to-br from-rose-50 to-pink-50 py-24">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+      <span class="inline-block bg-rose-100 text-rose-700 text-sm font-medium px-3 py-1 rounded-full mb-6">AI Relationship Intelligence</span>
+      <h1 class="text-5xl font-bold text-gray-900 mb-6 leading-tight">
+        Prevent Relationship Problems<br>
+        <span class="text-rose-500">Before They Become Crises</span>
+      </h1>
+      <p class="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
+        HarmonyAI detects small behavioral signals — mood changes, communication drops, missed events — and recommends small actions before trust erodes.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="{{ url('users:register') }}" class="bg-rose-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-rose-600 transition-colors">
+          Start Free — No Credit Card
+        </a>
+        <a href="#how-it-works" class="bg-white text-gray-700 px-8 py-4 rounded-xl font-semibold text-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+          See How It Works
+        </a>
+      </div>
+    </div>
+  </section>
+
+  {# How it works #}
+  <section id="how-it-works" class="py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-4">
+      <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">How It Works</h2>
+      <p class="text-center text-gray-500 mb-14">Most relationships fail from many small unresolved events. HarmonyAI catches them early.</p>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="text-center p-6">
+          <div class="w-14 h-14 bg-rose-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <span class="text-2xl">📊</span>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-2">Track Daily Signals</h3>
+          <p class="text-gray-500 text-sm">Log mood, connection score, and key events in under 30 seconds per day.</p>
+        </div>
+        <div class="text-center p-6">
+          <div class="w-14 h-14 bg-rose-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <span class="text-2xl">🧠</span>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-2">AI Detects Patterns</h3>
+          <p class="text-gray-500 text-sm">Our AI identifies emotional drift, communication drops, and recurring conflict themes.</p>
+        </div>
+        <div class="text-center p-6">
+          <div class="w-14 h-14 bg-rose-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <span class="text-2xl">💡</span>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-2">Take Small Actions</h3>
+          <p class="text-gray-500 text-sm">Get specific, gentle suggestions before small issues grow into big conflicts.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# CTA #}
+  <section class="py-20 bg-rose-500">
+    <div class="max-w-2xl mx-auto px-4 text-center">
+      <h2 class="text-3xl font-bold text-white mb-4">Start Today. It's Free.</h2>
+      <p class="text-rose-100 mb-8">Join people building stronger relationships with small daily habits.</p>
+      <a href="{{ url('users:register') }}" class="inline-block bg-white text-rose-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-rose-50 transition-colors">
+        Create Your Account
+      </a>
+    </div>
+  </section>
+
+  <footer class="bg-gray-900 text-gray-400 text-center py-8 text-sm">
+    © 2024 HarmonyAI. AI observations only — never diagnoses or accusations.
+  </footer>
+</div>
+{% endblock %}

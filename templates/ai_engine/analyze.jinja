@@ -1,0 +1,98 @@
+{% extends "layouts/app.jinja" %}
+{% block page_title %}AI Conflict Analyzer{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+
+  {# Header #}
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-xl font-bold text-gray-900">AI Conflict Analyzer</h2>
+      <p class="text-sm text-gray-500 mt-1">Get root causes + action steps from HarmonyAI</p>
+    </div>
+    <a href="{{ url('relationships:detail', pk=relationship.pk) }}"
+       class="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Back
+    </a>
+  </div>
+
+  {# Active conflicts list #}
+  {% if conflicts %}
+  <div class="space-y-3">
+    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider">Unresolved Conflicts</h3>
+    {% for conflict in conflicts %}
+    <div class="bg-white rounded-2xl border border-gray-200 p-5">
+      <div class="flex items-start justify-between gap-4">
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xs font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full bg-red-100 text-red-700">
+              {{ conflict.get_category_display() }}
+            </span>
+            <span class="text-xs text-gray-500">Severity {{ conflict.severity }}/5</span>
+          </div>
+          <p class="text-sm text-gray-700 leading-relaxed">{{ conflict.description }}</p>
+          <p class="text-xs text-gray-400 mt-2">{{ conflict.created_at.strftime('%d %b %Y') }}</p>
+        </div>
+        <div id="analysis-{{ conflict.pk }}">
+          <button
+            hx-post="{{ url('ai_engine:analyze', rel_pk=relationship.pk) }}"
+            hx-vals='{"conflict_id": "{{ conflict.pk }}"}'
+            hx-target="#analysis-{{ conflict.pk }}"
+            hx-swap="innerHTML"
+            hx-indicator="#spinner-{{ conflict.pk }}"
+            class="flex items-center gap-2 bg-rose-500 hover:bg-rose-600 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors whitespace-nowrap">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.347.347a3.78 3.78 0 01-.57.37l-.008.004A3.714 3.714 0 0112 17m0 0V9"/>
+            </svg>
+            Analyze with AI
+            <span id="spinner-{{ conflict.pk }}" class="htmx-indicator">
+              <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+            </span>
+          </button>
+          {% include "includes/csrf.jinja" ignore missing %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="bg-white rounded-2xl border border-gray-200 p-10 text-center">
+    <div class="text-4xl mb-3">🎉</div>
+    <p class="text-gray-600 font-medium">No unresolved conflicts</p>
+    <p class="text-sm text-gray-400 mt-1">Log a conflict from the relationship page to get AI insights.</p>
+    <a href="{{ url('relationships:detail', pk=relationship.pk) }}"
+       class="inline-block mt-4 text-sm text-rose-500 font-medium hover:text-rose-600">Go to relationship →</a>
+  </div>
+  {% endif %}
+
+  {# Past analyses #}
+  {% if past_analyses %}
+  <div>
+    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">Recent Analyses</h3>
+    <div class="space-y-2">
+      {% for insight in past_analyses %}
+      {% set data = insight.content | safe %}
+      <div class="bg-gray-50 rounded-xl border border-gray-200 p-4">
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-xs font-medium text-gray-600">{{ insight.input_summary[:80] }}…</span>
+          <span class="text-xs text-gray-400">{{ insight.created_at.strftime('%d %b') }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+
+<style>
+.htmx-indicator { display: none; }
+.htmx-request .htmx-indicator { display: inline-block; }
+</style>
+{% endblock %}

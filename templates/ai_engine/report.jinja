@@ -1,0 +1,77 @@
+{% extends "layouts/app.jinja" %}
+{% block page_title %}Weekly Report{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-6">
+
+  {# Header #}
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-xl font-bold text-gray-900">Weekly Report</h2>
+      <p class="text-sm text-gray-500 mt-1">AI-generated relationship health summary</p>
+    </div>
+    <a href="{{ url('relationships:detail', pk=relationship.pk) }}"
+       class="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Back
+    </a>
+  </div>
+
+  {# Generate button #}
+  <div id="report-container">
+    {% if report %}
+      {% include "ai_engine/partials/_weekly_report.jinja" %}
+      <div class="text-center">
+        <p class="text-xs text-gray-400 mb-3">Generated {{ generated_at.strftime('%d %b %Y at %H:%M') }}</p>
+        <button
+          hx-post="{{ url('ai_engine:report', rel_pk=relationship.pk) }}"
+          hx-target="#report-container"
+          hx-swap="innerHTML"
+          hx-indicator="#report-spinner"
+          class="text-sm text-rose-500 hover:text-rose-600 font-medium flex items-center gap-1.5 mx-auto">
+          Regenerate report
+          <span id="report-spinner" class="htmx-indicator">
+            <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+          </span>
+        </button>
+        {{ csrf_input }}
+      </div>
+    {% else %}
+      <div class="bg-white rounded-2xl border border-gray-200 p-10 text-center">
+        <div class="text-5xl mb-4">📊</div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">No report yet</h3>
+        <p class="text-sm text-gray-500 mb-6">Generate your first weekly AI relationship health report.</p>
+        <button
+          hx-post="{{ url('ai_engine:report', rel_pk=relationship.pk) }}"
+          hx-target="#report-container"
+          hx-swap="innerHTML"
+          hx-indicator="#report-spinner"
+          class="inline-flex items-center gap-2 bg-rose-500 hover:bg-rose-600 text-white font-medium px-6 py-3 rounded-xl transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.347.347a3.78 3.78 0 01-.57.37l-.008.004A3.714 3.714 0 0112 17m0 0V9"/>
+          </svg>
+          Generate Weekly Report
+          <span id="report-spinner" class="htmx-indicator">
+            <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+          </span>
+        </button>
+        {{ csrf_input }}
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<style>
+.htmx-indicator { display: none; }
+.htmx-request .htmx-indicator { display: inline-flex; }
+</style>
+{% endblock %}

@@ -1,0 +1,72 @@
+[DONE] Phase 1 - Django 5.1 project created (harmonyai/)
+[DONE] Phase 1 - Apps created: users, dashboard, control, relationships, moods
+[DONE] Phase 1 - settings.py: custom user model, Jinja2 engine, Whitenoise, dotenv
+[DONE] Phase 1 - harmonyai/jinja2.py: Jinja2 environment with static() and url()
+[DONE] Phase 1 - Custom User model (email-based, AbstractBaseUser)
+[DONE] Phase 1 - Profile model (avatar, timezone, bio, is_premium)
+[DONE] Phase 1 - Relationship model (creator, partner, type, status, invite_token)
+[DONE] Phase 1 - Event model (birthday, anniversary, promise, vacation, etc.)
+[DONE] Phase 1 - ConflictEntry model (category, severity, resolved)
+[DONE] Phase 1 - MoodEntry model (happy/neutral/sad/angry/stressed + score)
+[DONE] Phase 1 - ConnectionScore model (1-10 daily)
+[DONE] Phase 1 - users: forms, services, views (register/login/logout/profile), urls
+[DONE] Phase 1 - dashboard: views (landing + home), urls
+[DONE] Phase 1 - control: views (dashboard + user list with HTMX search), urls
+[DONE] Phase 1 - Templates: base.jinja, layouts/app.jinja (sidebar + topbar)
+[DONE] Phase 1 - Templates: auth/login.jinja, auth/register.jinja
+[DONE] Phase 1 - Templates: pages/landing.jinja, pages/dashboard.jinja
+[DONE] Phase 1 - Templates: control/base_control.jinja, dashboard.jinja, users.jinja
+[DONE] Phase 1 - makemigrations + migrate applied (all 25 migrations OK)
+[DONE] Phase 1 - Superuser created: admin@harmonyai.com / admin1234
+[DONE] Phase 1 - Test user created: test@harmonyai.com / test1234
+[DONE] Phase 1 - Server running: http://127.0.0.1:8000/ (200 OK)
+[DONE] Phase 1 - /auth/login/ (200), /auth/register/ (200), /dashboard/ (302→login)
+[DONE] Phase 1 - relationships: forms, services, views, urls (create/invite/accept/decline/detail)
+[DONE] Phase 1 - relationships/detail: health score widget (circular gauge), conflict journal, events, HTMX check-in
+[DONE] Phase 1 - moods: forms, services, views (HTMX mood + connection score), urls
+[DONE] Phase 1 - relationships/services.py: calculate_health_score(), get_conflict_patterns(), get_upcoming_events()
+[DONE] Phase 1 - admin.py registered for Relationship, Event, ConflictEntry
+[DONE] REST API - DRF + JWT installed, api/ app created
+[DONE] REST API - api/serializers.py: all models serialized
+[DONE] REST API - api/views.py: register, login, profile, relationships, health, events, conflicts, moods
+[DONE] REST API - /api/v1/ endpoints live — JWT auth working (tested)
+[DONE] Flutter - flutter_app/ full project created (no Flutter SDK needed to inspect)
+[DONE] Flutter - models: user.dart, relationship.dart, mood.dart
+[DONE] Flutter - services: api_service.dart (full REST client), auth_provider.dart
+[DONE] Flutter - screens: login, register, home, relationship_detail, create_relationship
+[DONE] Flutter - theme.dart (Material 3, rose color scheme)
+[DONE] Phase 2 - anthropic SDK installed (0.106.0), ANTHROPIC_API_KEY added to .env + settings
+[DONE] Phase 2 - ai_engine app created (models: AIInsight, ChatMessage)
+[DONE] Phase 2 - ai_engine/services.py: analyze_conflict(), detect_patterns(), generate_weekly_report(), chat_with_coach() using claude-opus-4-8
+[DONE] Phase 2 - ai_engine/views.py: ConflictAnalyzeView, PatternDetectView, WeeklyReportView, CoachChatView (all HTMX)
+[DONE] Phase 2 - Templates: ai_engine/analyze.jinja, coach.jinja, report.jinja + all partials
+[DONE] Phase 2 - relationships/detail.jinja: AI Engine cards (Conflict Analyzer, Weekly Report, AI Coach) + Pattern Detection HTMX button
+[DONE] Phase 2 - REST API: /api/v1/relationships/<id>/ai/analyze|patterns|report|coach/ endpoints
+[DONE] Phase 2 - Flutter: ai_coach_screen.dart (animated typing indicator), weekly_report_screen.dart
+[DONE] Phase 2 - Flutter: api_service.dart AI methods added, AI buttons on RelationshipDetailScreen
+[DONE] Phase 2 - Migration applied: ai_engine.0001_initial (AIInsight + ChatMessage)
+[DONE] Phase 2 - System check: 0 issues. All AI URLs verified.
+[DONE] Phase 3 - billing app: Subscription model, AIUsage model, migration applied
+[DONE] Phase 3 - billing/services.py: check_ai_limit(), increment_usage(), create_razorpay_order(), verify_and_activate(), get_billing_status()
+[DONE] Phase 3 - billing/views.py: BillingStatusView, CreateOrderView, VerifyPaymentView, CancelSubscriptionView, ActivateTestPremiumView
+[DONE] Phase 3 - REST API: /api/v1/billing/status|create-order|verify|cancel|activate-test
+[DONE] Phase 3 - Freemium gates on all AI endpoints (analyze=2, pattern=1, report=1, coach=10 per month free)
+[DONE] Phase 3 - Flow fix: EventSerializer, ConflictSerializer, MoodEntrySerializer relationship field → read_only (POST body no longer requires it)
+[DONE] Phase 3 - Flow fix: LoginView added (returns user + tokens), ProfileSerializer is_premium read_only
+[DONE] Phase 3 - Flow fix: Token refresh interceptor in Flutter api_service.dart (_get/_post with auto-refresh on 401)
+[DONE] Phase 3 - Flutter: user.dart isPremium field added + copyWith()
+[DONE] Phase 3 - Flutter: auth_provider.dart isPremium from profile, refreshPremiumStatus()
+[DONE] Phase 3 - Flutter: premium_screen.dart (features comparison, ₹199 pricing, test premium activation, payment sheet, counseling resources)
+[DONE] Phase 3 - Flutter: home_screen.dart ProfileTab shows premium badge / upgrade button, premium tile
+[DONE] Phase 3 - Flutter: relationship_detail_screen.dart AI tools show usage badge, lock icon, paywall redirect
+[DONE] Phase 3 - Flutter: ai_coach_screen.dart handles limit_reached → paywall
+[DONE] Phase 3 - Flutter: weekly_report_screen.dart LimitReachedCard, CounselingCard with referrals
+[DONE] Phase 3 - Flutter: url_launcher added to pubspec.yaml
+[DONE] Phase 3 - razorpay==1.4.1 added to requirements.txt
+[DONE] Seed Data - seed_data.py management command fixed (raw SQL INSERT bypass auto_now_add), seeds 3 users + couple + family relationships + 14 days mood/connection + 6 events + 4 conflicts
+[DONE] Seed Data - Run: python3 manage.py seed_data --reset (test@harmonyai.com, priya@harmonyai.com, ravi@harmonyai.com all test1234)
+[DONE] Flutter - home_screen.dart: Full redesign with 4-tab nav (Home/Bonds/Calendar/Profile)
+[DONE] Flutter - HomeTab: dark gradient hero header, stats row (streak/connections/upcoming), horizontal relationship health cards with gradients and score bars, 2x2 quick action grid (Log Mood/AI Coach/Patterns/Weekly Report), upcoming events list with countdown, AI insight card (premium) or upgrade banner (free)
+[DONE] Flutter - RelationshipsTab: redesigned with colored left accent bar, gradient-tinted avatars, shadow cards
+[DONE] Flutter - ProfileTab: dark gradient header, settings sections (Account/App), styled sign-out button
+[DONE] Flutter - Bottom nav: custom 4-tab (_NavItem) with animated indicator highlight

@@ -1,0 +1,7 @@
+Superuser (staff/admin access)
+email: admin@harmonyai.com
+password: admin1234
+
+Test User (regular)
+email: test@harmonyai.com
+password: test1234

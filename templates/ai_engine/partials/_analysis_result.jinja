@@ -1,0 +1,72 @@
+{% if result.error %}
+<div class="mt-3 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+  {{ result.error }}
+</div>
+{% else %}
+<div class="mt-3 space-y-4 bg-rose-50 border border-rose-200 rounded-2xl p-5">
+
+  {# Spark badge #}
+  <div class="flex items-center gap-2 mb-1">
+    <span class="text-rose-500 font-bold text-sm">✦ HarmonyAI Analysis</span>
+  </div>
+
+  {# Root Causes #}
+  <div>
+    <p class="text-xs font-semibold uppercase tracking-wider text-rose-700 mb-2">Root Causes</p>
+    <ul class="space-y-1.5">
+      {% for cause in result.root_causes %}
+      <li class="flex items-start gap-2 text-sm text-gray-700">
+        <span class="text-rose-400 mt-0.5">▸</span>{{ cause }}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  {# Perspectives #}
+  <div class="grid grid-cols-2 gap-3">
+    <div class="bg-white rounded-xl p-3 border border-rose-100">
+      <p class="text-xs font-semibold text-gray-500 mb-1">Your perspective</p>
+      <p class="text-xs text-gray-700 leading-relaxed">{{ result.person_a_perspective }}</p>
+    </div>
+    <div class="bg-white rounded-xl p-3 border border-rose-100">
+      <p class="text-xs font-semibold text-gray-500 mb-1">Their perspective</p>
+      <p class="text-xs text-gray-700 leading-relaxed">{{ result.person_b_perspective }}</p>
+    </div>
+  </div>
+
+  {# Action Steps #}
+  <div>
+    <p class="text-xs font-semibold uppercase tracking-wider text-rose-700 mb-2">Action Steps</p>
+    <ol class="space-y-1.5">
+      {% for step in result.action_steps %}
+      <li class="flex items-start gap-2 text-sm text-gray-700">
+        <span class="w-5 h-5 rounded-full bg-rose-500 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">{{ loop.index }}</span>
+        {{ step }}
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+
+  {# Watch out #}
+  {% if result.watch_out %}
+  <div class="bg-amber-50 border border-amber-200 rounded-xl p-3">
+    <p class="text-xs font-semibold text-amber-700 mb-1">⚠ Watch out for</p>
+    <p class="text-xs text-amber-800">{{ result.watch_out }}</p>
+  </div>
+  {% endif %}
+
+  {# Timeframe badge #}
+  {% if result.resolution_timeframe %}
+  <div class="flex items-center gap-2">
+    <span class="text-xs text-gray-500">Expected resolution:</span>
+    <span class="text-xs font-medium px-2 py-0.5 rounded-full
+      {% if result.resolution_timeframe == 'short_term' %}bg-green-100 text-green-700
+      {% elif result.resolution_timeframe == 'medium_term' %}bg-yellow-100 text-yellow-700
+      {% else %}bg-red-100 text-red-700{% endif %}">
+      {{ result.resolution_timeframe | replace('_', ' ') | title }}
+    </span>
+  </div>
+  {% endif %}
+
+</div>
+{% endif %}
